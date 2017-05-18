@@ -1,0 +1,17 @@
+#ignore everything
+/*
+/*/
+
+#ignore specific folders
+**/dist/
+**/lib/
+
+#Track specific files
+!.gitignore
+!README.md
+!package.json
+!webpack.config.js
+
+#Track specific folders
+!/src/
+!/config/
