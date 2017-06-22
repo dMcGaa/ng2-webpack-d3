@@ -1,5 +1,7 @@
 import { Component } from '@angular/core';
 import * as d3 from 'd3';
+//import 'd3-scale';
+//import 'd3-axis';
 import AUTOMPG from './data/auto-mpg';
 
 @Component({
@@ -34,22 +36,51 @@ export class AppComponent {
       
     let vis = d3.select("#mpg-graph")
       .append("svg");
-    const w = 900, h = 400;
-    const gTick = w/AUTOMPG.length;
+    const w = 900,
+      h = 400,
+      axisOffestBottom = 40;
     vis.attr("width", w)
       .attr("height", h);
+    
+    var yScale = d3.scaleLinear()
+    .domain([0, 50])
+    .range([h, 0]);
+    
+    const xScale = d3.scaleLinear()
+    .domain([68, 84])
+    .range([10, w-10])
+    
+    const cirRad = 4;
       
     vis.text("The Graph")
       .select("#graph");
+    
+    const axisL = d3.axisLeft(yScale);
+    const axisB = d3.axisBottom(xScale);
+    
+    var div = vis.append("div")	
+      .attr("class", "tooltip")				
+      .style("opacity", 0);
       
     vis.selectAll("circle .cars")
-     .data(AUTOMPG)
-     .enter()
-     .append("svg:circle")
-     .attr("class", ".cars")
-     .attr("cy", function(d) { return d.miles.gallon; })
-     .attr("cx", function(d, i) { return i*gTick; })
-     .attr("r", "2px")
-     .attr("fill", "black");
-  }
+      .data(AUTOMPG)
+      .enter()
+      .append("svg:circle")
+      .attr("class", ".cars")
+      .attr("cy", function(d) {
+        return yScale(d.miles.gallon); 
+      })
+      .attr("cx", function(d, i) { return xScale(d["model year"]); })
+      .attr("r", `${cirRad}px`)
+      .attr("fill", "black")
+      .append("svg:title")
+      .text(function(d) { return `${d["car name"]}:${d.miles.gallon}`; }); 
+  
+    vis.append("g")
+      .attr("transform", `translate(0,${h - axisOffestBottom + 20})`)
+      .call(axisB);
+      
+    vis.append("g")
+      .attr("transform", `translate(30,${0})`)
+      .call(axisL);  }
 }
